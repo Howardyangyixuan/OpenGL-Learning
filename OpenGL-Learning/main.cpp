@@ -4,27 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include "Shader.hpp"
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor;\n"
-    "out vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos,1.0);\n"
-    "   ourColor = aColor;\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "FragColor = vec4(ourColor,1.0);\n"
-    "}\n\0";
 int main()
 {
 //    glfw实例化
@@ -54,35 +39,7 @@ int main()
     glfwSetFramebufferSizeCallback(window,  framebuffer_size_callback);
     cout<<"设置回调"<<endl;
     //创建并编译顶点着色器
-    unsigned int vertexShader;
-    vertexShader = glad_glCreateShader(GL_VERTEX_SHADER);
-    glad_glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
-    glad_glCompileShader(vertexShader);
-    //成功与否
-    int  success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    //创建并编译片段着色器
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    //着色器程序，链接两个着色器
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    //激活程序
-    glUseProgram(shaderProgram);
-    //删除着色器对象
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader ourShader("../3.3.shader.vs", "../3.3.shader.fs");
     //三角形
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
@@ -123,7 +80,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         //
         //
-        glUseProgram(shaderProgram);
+        ourShader.use();
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //解绑
@@ -137,7 +94,6 @@ int main()
     cout<<"循环渲染"<<endl;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
     glfwTerminate();
 //    getchar();
     return 0;
