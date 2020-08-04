@@ -32,6 +32,7 @@
 		7A055FD224D809B700438B27 /* Shader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Shader.hpp; path = "OpenGL-Learning/Shader.hpp"; sourceTree = "<group>"; };
 		7A2A92BB24D8F24900B2F602 /* 3.3.shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = 3.3.shader.vs; sourceTree = "<group>"; };
 		7A2A92BC24D8F27000B2F602 /* 3.3.shader.fs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = 3.3.shader.fs; sourceTree = "<group>"; };
+		7A2A92BD24D95A2500B2F602 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		7A71F73A2490AA060037EF69 /* OpenGL-Learning */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OpenGL-Learning"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A71F73D2490AA060037EF69 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7A71F7452490ABF30037EF69 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -112,6 +113,7 @@
 				7A2A92BC24D8F27000B2F602 /* 3.3.shader.fs */,
 				7A2A92BB24D8F24900B2F602 /* 3.3.shader.vs */,
 				7A055FD124D809B700438B27 /* Shader.cpp */,
+				7A2A92BD24D95A2500B2F602 /* stb_image.h */,
 				7A055FD224D809B700438B27 /* Shader.hpp */,
 				7A71F73C2490AA060037EF69 /* OpenGL-Learning */,
 				7A71F73B2490AA060037EF69 /* Products */,
