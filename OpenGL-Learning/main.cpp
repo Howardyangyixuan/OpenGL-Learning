@@ -40,6 +40,10 @@ int main()
     cout<<"设置回调"<<endl;
     //创建并编译顶点着色器
     Shader ourShader("../3.3.shader.vs", "../3.3.shader.fs");
+    //在更改uniform之前，一定要使用一次
+    ourShader.use();
+    float offset = 0.5f;
+    ourShader.setFloat("offset", offset);
     //三角形
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
