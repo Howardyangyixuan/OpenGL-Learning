@@ -52,22 +52,23 @@ int main()
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
     float vertices[] = {
     //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // 右上
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // 右下
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // 左上
     };
     unsigned int indices[] = { // 注意索引从0开始!
         0, 1, 3, // 第一个三角形
         1, 2, 3  // 第二个三角形
     };
     //创建纹理
-    unsigned int texture;
-    glad_glGenTextures(1,&texture);
-    glad_glBindTexture(GL_TEXTURE_2D,texture);
+    unsigned int texture1,texture2;
+    glad_glGenTextures(1,&texture1);
+    glad_glBindTexture(GL_TEXTURE_2D, texture1);
     //设置环绕和过滤
-    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+        glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D,GL_CLAMP_TO_BORDER,(float []){1.0f,1.0f,1.0f,1.0f});
     glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     //加载纹理
@@ -80,7 +81,28 @@ int main()
         std::cout<<"加载纹理失败"<<std::endl;
     }
     stbi_image_free(data);
-    
+    //第二个纹理
+    glad_glGenTextures(1,&texture2);
+    glad_glBindTexture(GL_TEXTURE_2D, texture2);
+    //设置环绕和过滤
+    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glad_glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    //加载纹理
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load("../awesomeface.png", &width, &height, &nrChannels, 0);
+    if(data){
+        glad_glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
+        glad_glGenerateMipmap(GL_TEXTURE_2D);
+    }else{
+        std::cout<<"加载纹理失败"<<std::endl;
+    }
+    stbi_image_free(data);
+    //绑定纹理到着色器
+    ourShader.use();
+    glad_glUniform1i(glad_glGetUniformLocation(ourShader.ID,"ourTexture1"),0);
+    ourShader.setInt("ourTexture2", 1);
     
     //创建顶点缓冲对象
     unsigned int VBO;
@@ -115,10 +137,12 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         //
         //
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
         ourShader.use();
         glBindVertexArray(VAO);
-        glad_glBindTexture(GL_TEXTURE_2D,texture);
-//        glDrawArrays(GL_TRIANGLES, 0, 3);
         glad_glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
         //解绑
         glBindVertexArray(0);
