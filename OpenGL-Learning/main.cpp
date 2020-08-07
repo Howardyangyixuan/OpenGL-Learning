@@ -9,9 +9,11 @@
 #include "stb_image.h"
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+GLfloat mixPercent=0.5f;
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 int main()
 {
 //    glfw实例化
@@ -22,6 +24,8 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     cout<<"完成glfw实例化"<<endl;
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hello OpenGL", NULL, NULL);
+    //添加键盘回调函数
+    glfwSetKeyCallback(window, key_callback);
     if(window==NULL){
 //        cout<<window<<endl;
         cout<<"创建glfw窗口失败"<<endl;
@@ -52,10 +56,10 @@ int main()
     std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
     float vertices[] = {
     //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    0.55f, 0.55f,   // 右上
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   0.55f, 0.45f,    // 右下
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.45f, 0.45f, // Bottom Left 左下
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.45f, 0.55f  // Top Left    // 左上
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    1.0f, 1.0f,   // 右上
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,    // 右下
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // Bottom Left 左下
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left    // 左上
     };
     unsigned int indices[] = { // 注意索引从0开始!
         0, 1, 3, // 第一个三角形
@@ -132,16 +136,20 @@ int main()
     while(!glfwWindowShouldClose(window)){
         processInput(window);
         //绘制三角形
-        
         glClearColor(0.2f,0.3f,0.3f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         //
         //
+        ourShader.use();
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
+        glad_glUniform1i(glad_glGetUniformLocation(ourShader.ID,"ourTexture1"),0);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        ourShader.use();
+                ourShader.setInt("ourTexture2", 1);
+
+        glad_glUniform1f(glad_glGetUniformLocation(ourShader.ID,"mixPercent"),mixPercent);
         glBindVertexArray(VAO);
         glad_glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
         //解绑
@@ -167,4 +175,14 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode){
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    if(key == GLFW_KEY_UP && action == GLFW_PRESS){
+        if(mixPercent<1.0f)mixPercent+=0.1f;
+    }
+    if(key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+        if(mixPercent>0.0f)mixPercent-=0.1f;
+    }
 }
