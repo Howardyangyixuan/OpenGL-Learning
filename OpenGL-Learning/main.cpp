@@ -7,6 +7,9 @@
 #include "Shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 GLfloat mixPercent=0.5f;
@@ -16,6 +19,13 @@ void processInput(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 int main()
 {
+    glm::vec4 vec(1.0f,0.0f,0.0f,1.0f);
+    // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
+    // glm::mat4 trans;
+    // 这行代码就需要改为:
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0,0.0,1.0));
+    trans = glm::scale(trans, glm::vec3(0.5,0.5,0.5));
 //    glfw实例化
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -149,6 +159,8 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
                 ourShader.setInt("ourTexture2", 1);
 
+        unsigned int transLoc = glad_glGetUniformLocation(ourShader.ID,"transform");
+        glUniformMatrix4fv(transLoc,1,GL_FALSE,glm::value_ptr(trans));
         glad_glUniform1f(glad_glGetUniformLocation(ourShader.ID,"mixPercent"),mixPercent);
         glBindVertexArray(VAO);
         glad_glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
