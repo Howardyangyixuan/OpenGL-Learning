@@ -17,15 +17,15 @@ using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+
 int main()
 {
-    glm::vec4 vec(1.0f,0.0f,0.0f,1.0f);
     // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
     // glm::mat4 trans;
     // 这行代码就需要改为:
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0,0.0,1.0));
-    trans = glm::scale(trans, glm::vec3(0.5,0.5,0.5));
+    trans = glm::translate(trans, glm::vec3(0.5,-0.5,0.0));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0,0.0,1.0));
 //    glfw实例化
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -160,6 +160,9 @@ int main()
                 ourShader.setInt("ourTexture2", 1);
 
         unsigned int transLoc = glad_glGetUniformLocation(ourShader.ID,"transform");
+        glm::mat4 trans(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0,0.0,1.0));
+        trans = glm::translate(trans, glm::vec3(0.5,-0.5,0.0));
         glUniformMatrix4fv(transLoc,1,GL_FALSE,glm::value_ptr(trans));
         glad_glUniform1f(glad_glGetUniformLocation(ourShader.ID,"mixPercent"),mixPercent);
         glBindVertexArray(VAO);
@@ -183,11 +186,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
+
 void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode){
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
