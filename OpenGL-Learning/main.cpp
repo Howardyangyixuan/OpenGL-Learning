@@ -153,13 +153,18 @@ int main()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    //开启Z缓冲，即深度测试
+    glad_glEnable(GL_DEPTH_TEST);
     //
     while(!glfwWindowShouldClose(window)){
         processInput(window);
         //绘制三角形
         glClearColor(0.2f,0.3f,0.3f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        //
+        
+        //清除颜色缓冲
+        glClear(GL_DEPTH_BUFFER_BIT);
+        
         //
         ourShader.use();
 
