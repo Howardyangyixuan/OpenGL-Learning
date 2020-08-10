@@ -20,12 +20,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 int main()
 {
-    // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
-    // glm::mat4 trans;
-    // 这行代码就需要改为:
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5,-0.5,0.0));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0,0.0,1.0));
 //    glfw实例化
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -37,7 +31,6 @@ int main()
     //添加键盘回调函数
     glfwSetKeyCallback(window, key_callback);
     if(window==NULL){
-//        cout<<window<<endl;
         cout<<"创建glfw窗口失败"<<endl;
         glfwTerminate();
         return -1;
@@ -56,10 +49,6 @@ int main()
     cout<<"设置回调"<<endl;
     //创建并编译顶点着色器
     Shader ourShader("../3.3.shader.vs", "../3.3.shader.fs");
-    //在更改uniform之前，一定要使用一次
-    ourShader.use();
-    float offset = 0.5f;
-    ourShader.setFloat("offset", offset);
     //三角形
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
@@ -158,15 +147,23 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
                 ourShader.setInt("ourTexture2", 1);
-
-        unsigned int transLoc = glad_glGetUniformLocation(ourShader.ID,"transform");
-        glm::mat4 trans(1.0f);
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0,0.0,1.0));
-        trans = glm::translate(trans, glm::vec3(0.5,-0.5,0.0));
-        glUniformMatrix4fv(transLoc,1,GL_FALSE,glm::value_ptr(trans));
-        glad_glUniform1f(glad_glGetUniformLocation(ourShader.ID,"mixPercent"),mixPercent);
+        // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
+        // glm::mat4 trans;
+        // 这行代码就需要改为:
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model,glm::radians(-55.0f),glm::vec3(1.0f,0.0f,0.0f));
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f,0.0f,-3.0f));
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
+        ourShader.setMat4("model", model);
+        ourShader.setMat4("view", view);
+        ourShader.setMat4("projection", projection);
+        ourShader.setFloat("mixPercent", mixPercent);
+        
         glBindVertexArray(VAO);
         glad_glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+        
         //解绑
         glBindVertexArray(0);
         //绘制颜色
