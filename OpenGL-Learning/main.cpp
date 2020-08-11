@@ -191,7 +191,11 @@ int main()
         // glm::mat4 trans;
         // 这行代码就需要改为:
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(1.0f,1.0f,-10.0f));
+//        view = glm::lookAt(glm::vec3(0.0f,0.0f,3.0f), glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
+        float radius = 10.0f;
+        float CamX = sin(glfwGetTime()) * radius;
+        float CamZ = cos(glfwGetTime()) * radius;
+        view = glm::lookAt(glm::vec3(CamX,0.0f,CamZ), glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
         ourShader.setMat4("view", view);
