@@ -13,11 +13,23 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 GLfloat mixPercent=0.5f;
+glm::vec3 cameraPos = glm::vec3(0.0f,0.0f,0.3f);
+glm::vec3 cameraFront = glm::vec3(0.0f,0.0f,-1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f,1.0f,0.0f);
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
+float cameraSpeed = 0.05f;
+float lastX = 400;
+float lastY = 300;
+float pitch = 0.0f;
+float yaw = 0.0f;
+float fov = 45.0f;
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
-
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 int main()
 {
 //    glfw实例化
@@ -28,6 +40,12 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     cout<<"完成glfw实例化"<<endl;
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hello OpenGL", NULL, NULL);
+    //隐藏光标
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //添加滚轮回调
+    glfwSetScrollCallback(window, scroll_callback);
+    //添加鼠标回调函数
+    glfwSetCursorPosCallback(window, mouse_callback);
     //添加键盘回调函数
     glfwSetKeyCallback(window, key_callback);
     if(window==NULL){
@@ -170,6 +188,10 @@ int main()
     glad_glEnable(GL_DEPTH_TEST);
     //
     while(!glfwWindowShouldClose(window)){
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        cameraSpeed = 2.5f * deltaTime;
         processInput(window);
         //绘制三角形
         glClearColor(0.2f,0.3f,0.3f,1.0f);
@@ -191,13 +213,9 @@ int main()
         // glm::mat4 trans;
         // 这行代码就需要改为:
         glm::mat4 view = glm::mat4(1.0f);
-//        view = glm::lookAt(glm::vec3(0.0f,0.0f,3.0f), glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
-        float radius = 10.0f;
-        float CamX = sin(glfwGetTime()) * radius;
-        float CamZ = cos(glfwGetTime()) * radius;
-        view = glm::lookAt(glm::vec3(CamX,0.0f,CamZ), glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f));
+        view = glm::lookAt(cameraPos,cameraFront+cameraPos,cameraUp);
         glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(fov),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
         ourShader.setMat4("view", view);
         ourShader.setMat4("projection", projection);
         ourShader.setFloat("mixPercent", mixPercent);
@@ -235,6 +253,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow *window)
 {
+
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
@@ -248,4 +267,40 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if(key == GLFW_KEY_DOWN && action == GLFW_PRESS){
         if(mixPercent>0.0f)mixPercent-=0.1f;
     }
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+        cameraPos -= cameraSpeed * cameraFront;
+    }
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+        cameraPos -= cameraSpeed * glm::normalize(glm::cross(cameraFront,cameraUp));
+    }
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+        cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraFront,cameraUp));
+    }
+}
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+    float offsetX = xpos - lastX;
+    float offsetY = lastY - ypos ;
+    lastX = xpos;
+    lastY = ypos;
+    float sensitivity = 0.05f;
+    offsetX *= sensitivity;
+    offsetY *= sensitivity;
+    yaw += offsetX;
+    if(pitch > -89.0f && pitch < 89.0f ) pitch += offsetY;
+    glm::vec3 front = glm::vec3(1.0f);
+    front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+    front.y = sin(glm::radians(pitch));
+    front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+    cameraFront = glm::normalize(front);
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+      if(fov >= 1.0f && fov <= 45.0f)
+      fov -= yoffset;
+    if(fov <= 1.0f)
+      fov = 1.0f;
+    if(fov >= 45.0f)
+      fov = 45.0f;
 }
