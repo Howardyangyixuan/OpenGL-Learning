@@ -13,6 +13,7 @@
 		7A71F7482490AC930037EF69 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A71F7472490AC930037EF69 /* libglfw.3.3.dylib */; };
 		7A71F74A2490ACA60037EF69 /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A71F7492490ACA60037EF69 /* libGLEW.2.1.0.dylib */; };
 		7A72056924CC778600A67C6B /* glad.c in Sources */ = {isa = PBXBuildFile; fileRef = 7A72056824CC778600A67C6B /* glad.c */; };
+		7A8C062F24E378AB00A17AAA /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A8C062D24E378AB00A17AAA /* Camera.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -91,6 +92,8 @@
 		7A71F77D24913FAC0037EF69 /* libopencv_tracking.4.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_tracking.4.3.0.dylib; path = ../../../../../usr/local/Cellar/opencv/4.3.0/lib/libopencv_tracking.4.3.0.dylib; sourceTree = "<group>"; };
 		7A71F77E24913FAC0037EF69 /* libopencv_videoio.4.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_videoio.4.3.0.dylib; path = ../../../../../usr/local/Cellar/opencv/4.3.0/lib/libopencv_videoio.4.3.0.dylib; sourceTree = "<group>"; };
 		7A72056824CC778600A67C6B /* glad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glad.c; path = ../../../../Downloads/glad/src/glad.c; sourceTree = "<group>"; };
+		7A8C062D24E378AB00A17AAA /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
+		7A8C062E24E378AB00A17AAA /* Camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Camera.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +116,8 @@
 				7A2A92BC24D8F27000B2F602 /* 3.3.shader.fs */,
 				7A2A92BB24D8F24900B2F602 /* 3.3.shader.vs */,
 				7A055FD124D809B700438B27 /* Shader.cpp */,
+				7A8C062D24E378AB00A17AAA /* Camera.cpp */,
+				7A8C062E24E378AB00A17AAA /* Camera.hpp */,
 				7A2A92BD24D95A2500B2F602 /* stb_image.h */,
 				7A055FD224D809B700438B27 /* Shader.hpp */,
 				7A71F73C2490AA060037EF69 /* OpenGL-Learning */,
@@ -257,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A8C062F24E378AB00A17AAA /* Camera.cpp in Sources */,
 				7A71F73E2490AA060037EF69 /* main.cpp in Sources */,
 				7A055FD324D809B700438B27 /* Shader.cpp in Sources */,
 				7A72056924CC778600A67C6B /* glad.c in Sources */,

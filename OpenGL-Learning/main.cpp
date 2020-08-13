@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Camera.hpp"
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 GLfloat mixPercent=0.5f;
@@ -24,6 +25,7 @@ float lastY = 300;
 float pitch = 0.0f;
 float yaw = 0.0f;
 float fov = 45.0f;
+Camera ourCamera(glm::vec3(0.0f,0.0f,0.3f));
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -186,7 +188,8 @@ int main()
 
     //开启Z缓冲，即深度测试
     glad_glEnable(GL_DEPTH_TEST);
-    //
+    //构造摄影机
+    
     while(!glfwWindowShouldClose(window)){
         float currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
@@ -212,10 +215,9 @@ int main()
         // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
         // glm::mat4 trans;
         // 这行代码就需要改为:
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::lookAt(cameraPos,cameraFront+cameraPos,cameraUp);
+        glm::mat4 view = ourCamera.getViewMatrix();
         glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(fov),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(ourCamera.Zoom),float(SCR_WIDTH / SCR_HEIGHT), 0.1f, 100.0f);
         ourShader.setMat4("view", view);
         ourShader.setMat4("projection", projection);
         ourShader.setFloat("mixPercent", mixPercent);
@@ -268,16 +270,16 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         if(mixPercent>0.0f)mixPercent-=0.1f;
     }
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        cameraPos += cameraSpeed * cameraFront;
+        ourCamera.processKeyboard(FORWARD, deltaTime);
     }
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        cameraPos -= cameraSpeed * cameraFront;
+        ourCamera.processKeyboard(BACKWARD, deltaTime);
     }
     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-        cameraPos -= cameraSpeed * glm::normalize(glm::cross(cameraFront,cameraUp));
+        ourCamera.processKeyboard(LEFT, deltaTime);
     }
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        cameraPos += cameraSpeed * glm::normalize(glm::cross(cameraFront,cameraUp));
+        ourCamera.processKeyboard(RIGHT, deltaTime);
     }
 }
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
@@ -285,22 +287,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
     float offsetY = lastY - ypos ;
     lastX = xpos;
     lastY = ypos;
-    float sensitivity = 0.05f;
-    offsetX *= sensitivity;
-    offsetY *= sensitivity;
-    yaw += offsetX;
-    if(pitch > -89.0f && pitch < 89.0f ) pitch += offsetY;
-    glm::vec3 front = glm::vec3(1.0f);
-    front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-    front.y = sin(glm::radians(pitch));
-    front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-    cameraFront = glm::normalize(front);
+    ourCamera.processMouseMovement(offsetX, offsetY);
 }
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
-      if(fov >= 1.0f && fov <= 45.0f)
-      fov -= yoffset;
-    if(fov <= 1.0f)
-      fov = 1.0f;
-    if(fov >= 45.0f)
-      fov = 45.0f;
+    ourCamera.processMouseScroll(yoffset);
 }
